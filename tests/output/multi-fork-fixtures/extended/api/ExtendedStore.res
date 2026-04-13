@@ -10,15 +10,12 @@ type getstoreinventoryResponse = dict<JSON.t>
 let getstoreinventoryResponseSchema = S.dict(S.json)
 
 /** Returns pet inventories by status */
-let getstoreinventory = (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): promise<getstoreinventoryResponse> => {
+let getstoreinventory = async (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): getstoreinventoryResponse => {
 
-  fetch(
+  let response = await fetch(
     ~url="/store/inventory",
     ~method_="GET",
     ~body=None,
-  )->Promise.then(response => {
-  let value = response->S.parseOrThrow(getstoreinventoryResponseSchema)
-  value
-    ->Promise.resolve
-  })
+  )
+  response->S.parseOrThrow(getstoreinventoryResponseSchema)
 }

@@ -10,17 +10,14 @@ type getpetsResponse = array<PetstoreBaseComponentSchemas.Pet.t>
 let getpetsResponseSchema = S.array(PetstoreBaseComponentSchemas.Pet.schema)
 
 /** List all pets */
-let getpets = (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): promise<getpetsResponse> => {
+let getpets = async (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): getpetsResponse => {
 
-  fetch(
+  let response = await fetch(
     ~url="/pets",
     ~method_="GET",
     ~body=None,
-  )->Promise.then(response => {
-  let value = response->S.parseOrThrow(getpetsResponseSchema)
-  value
-    ->Promise.resolve
-  })
+  )
+  response->S.parseOrThrow(getpetsResponseSchema)
 }
 
 type postpetsRequest = PetstoreBaseComponentSchemas.Pet.t
@@ -30,17 +27,14 @@ let postpetsRequestSchema = PetstoreBaseComponentSchemas.Pet.schema
 type postpetsResponse = unit
 
 /** Create a pet */
-let postpets = (~body: postpetsRequest, ~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): promise<postpetsResponse> => {
+let postpets = async (~body: postpetsRequest, ~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): postpetsResponse => {
   let jsonBody = body->S.reverseConvertToJsonOrThrow(postpetsRequestSchema)
-  fetch(
+  let response = await fetch(
     ~url="/pets",
     ~method_="POST",
     ~body=Some(jsonBody),
-  )->Promise.then(response => {
+  )
   let _ = response
-  ()
-    ->Promise.resolve
-  })
 }
 
 type getpetsResponse = PetstoreBaseComponentSchemas.Pet.t
@@ -48,15 +42,12 @@ type getpetsResponse = PetstoreBaseComponentSchemas.Pet.t
 let getpetsResponseSchema = PetstoreBaseComponentSchemas.Pet.schema
 
 /** Info for a specific pet */
-let getpets = (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): promise<getpetsResponse> => {
+let getpets = async (~fetch: (~url: string, ~method_: string, ~body: option<JSON.t>) => Promise.t<JSON.t>): getpetsResponse => {
 
-  fetch(
+  let response = await fetch(
     ~url="/pets/{petId}",
     ~method_="GET",
     ~body=None,
-  )->Promise.then(response => {
-  let value = response->S.parseOrThrow(getpetsResponseSchema)
-  value
-    ->Promise.resolve
-  })
+  )
+  response->S.parseOrThrow(getpetsResponseSchema)
 }

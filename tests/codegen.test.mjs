@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolve } from '../lib/es6/src/core/SchemaRefResolver.mjs';
-import { compareSpecs, generateFromFile, generateFromUrl } from '../lib/es6/src/Codegen.mjs';
+import { resolve } from '../src/core/SchemaRefResolver.res.mjs';
+import { compareSpecs, generateFromFile, generateFromUrl } from '../src/Codegen.res.mjs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync, rmSync, mkdirSync } from 'fs';
