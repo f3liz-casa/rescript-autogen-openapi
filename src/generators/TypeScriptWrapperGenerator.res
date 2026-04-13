@@ -10,7 +10,7 @@ let misskeyClientJsCode = {
   body
 }
 
-let generateWrapperMjs = (~endpoints, ~generatedModulePath) => {
+let generateWrapperMjs = (~endpoints, ~generatedModulePath, ~modulePrefix) => {
   let endpointsByTag = OpenAPIParser.groupByTag(endpoints)
   let tags = Dict.keysToArray(endpointsByTag)
 
@@ -18,7 +18,9 @@ let generateWrapperMjs = (~endpoints, ~generatedModulePath) => {
     tags
     ->Array.map(tag => {
       let moduleName = CodegenUtils.toPascalCase(tag)
-      let importLine = `import * as ${moduleName} from '${generatedModulePath}/${moduleName}.mjs';`
+      // Use a distinct alias for the import to avoid collision with the exported namespace
+      let importAlias = `${moduleName}Api`
+      let importLine = `import * as ${importAlias} from '${generatedModulePath}/${modulePrefix}${moduleName}.res.mjs';`
       let methods =
         Dict.get(endpointsByTag, tag)
         ->Option.getOr([])
@@ -33,7 +35,7 @@ let generateWrapperMjs = (~endpoints, ~generatedModulePath) => {
             Templates.wrapperMjsMethod,
             {
               "functionName": functionName,
-              "moduleName": moduleName,
+              "moduleName": importAlias,
               "requestArg": hasRequestBody ? ", request" : "",
               "bodyArg": hasRequestBody ? "body: request, " : "",
             },
@@ -76,7 +78,7 @@ let generateWrapperDts = (~endpoints) => {
           }
         })
         ->Array.join("\n")
-      let importBlock = `import type {\n${typesToImport}\n} from '../types/${moduleName}.d.ts';`
+      let importBlock = `import type {\n${typesToImport}\n} from '../types/${moduleName}';`
 
       let functions =
         Dict.get(endpointsByTag, tag)
@@ -124,12 +126,12 @@ let generateWrapperDts = (~endpoints) => {
   Handlebars.render(Templates.wrapperDts, {"tags": tagData})
 }
 
-let generate = (~endpoints, ~outputDir, ~generatedModulePath="../generated") => {
+let generate = (~endpoints, ~outputDir, ~generatedModulePath="../api", ~modulePrefix="") => {
   Pipeline.fromFilesAndWarnings(
     [
       {
         FileSystem.path: FileSystem.makePath(outputDir, "wrapper/index.mjs"),
-        content: generateWrapperMjs(~endpoints, ~generatedModulePath),
+        content: generateWrapperMjs(~endpoints, ~generatedModulePath, ~modulePrefix),
       },
       {
         path: FileSystem.makePath(outputDir, "wrapper/index.d.ts"),

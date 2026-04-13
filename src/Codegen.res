@@ -44,7 +44,7 @@ let generateSingleSpecPure = (~spec: openAPISpec, ~config: generationConfig): re
       : Pipeline.empty
 
     let tsWrapperOutput = targets.typescriptWrapper
-      ? TypeScriptWrapperGenerator.generate(~endpoints, ~outputDir=config.wrapperOutputDir->Option.getOr(config.outputDir), ~generatedModulePath="../generated")
+      ? TypeScriptWrapperGenerator.generate(~endpoints, ~outputDir=config.wrapperOutputDir->Option.getOr(config.outputDir), ~generatedModulePath="../api", ~modulePrefix="")
       : Pipeline.empty
 
     Result.Ok(Pipeline.combine([baseOutput, wrapperOutput, dtsOutput, tsWrapperOutput]))
@@ -129,8 +129,8 @@ let processForkPure = (~baseSpec: openAPISpec, ~baseEndpoints: array<endpoint>, 
       ? TypeScriptDtsGenerator.generate(~spec=wSpec, ~endpoints=allWEndpoints, ~outputDir=FileSystem.makePath(config.dtsOutputDir->Option.getOr(config.outputDir), fork.name))
       : Pipeline.empty
 
-    let tsWrapperOutput = targets.typescriptWrapper 
-      ? TypeScriptWrapperGenerator.generate(~endpoints=allWEndpoints, ~outputDir=FileSystem.makePath(config.wrapperOutputDir->Option.getOr(config.outputDir), fork.name), ~generatedModulePath=`../../generated/${fork.name}`)
+    let tsWrapperOutput = targets.typescriptWrapper
+      ? TypeScriptWrapperGenerator.generate(~endpoints=allWEndpoints, ~outputDir=FileSystem.makePath(config.wrapperOutputDir->Option.getOr(config.outputDir), fork.name), ~generatedModulePath="../api", ~modulePrefix=CodegenUtils.toPascalCase(fork.name))
       : Pipeline.empty
 
     let reports = Pipeline.fromFiles([mergeReportFile, ...diffReportFile->Option.map(f => [f])->Option.getOr([])])
@@ -160,7 +160,7 @@ let generateMultiSpecPure = (~baseSpec: openAPISpec, ~forkSpecs: array<forkSpec>
         let baseWrappers = Pipeline.combine([
           targets.rescriptWrapper ? ThinWrapperGenerator.generateWrapper(~spec=baseSpec, ~endpoints=baseEndpoints, ~outputDir=baseOutputDir, ~wrapperModuleName=basePrefix ++ "Wrapper", ~generatedModulePrefix=basePrefix) : Pipeline.empty,
           targets.typescriptDts ? TypeScriptDtsGenerator.generate(~spec=baseSpec, ~endpoints=baseEndpoints, ~outputDir=FileSystem.makePath(config.dtsOutputDir->Option.getOr(config.outputDir), baseName)) : Pipeline.empty,
-          targets.typescriptWrapper ? TypeScriptWrapperGenerator.generate(~endpoints=baseEndpoints, ~outputDir=FileSystem.makePath(config.wrapperOutputDir->Option.getOr(config.outputDir), baseName), ~generatedModulePath=`../../generated/${baseName}`) : Pipeline.empty
+          targets.typescriptWrapper ? TypeScriptWrapperGenerator.generate(~endpoints=baseEndpoints, ~outputDir=FileSystem.makePath(config.wrapperOutputDir->Option.getOr(config.outputDir), baseName), ~generatedModulePath="../api", ~modulePrefix=basePrefix) : Pipeline.empty
         ])
         
         Result.Ok(Pipeline.combine(Array.concat(outputs, [baseWrappers])))

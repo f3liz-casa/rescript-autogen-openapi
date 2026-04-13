@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as CodegenJS from './Codegen.mjs';
+import * as CodegenJS from './Codegen.res.mjs';
 
 import type {codegenError as Types_codegenError} from './Types.gen';
 

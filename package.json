@@ -1,6 +1,6 @@
 {
   "name": "@f3liz/rescript-autogen-openapi",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Generate ReScript code with Sury schemas from OpenAPI 3.1 specs. Supports multiple forks with diff/merge capabilities.",
   "keywords": [
     "rescript",
@@ -16,8 +16,9 @@
   "license": "MPL-2.0",
   "files": [
     "src/**/*.res",
-    "lib/es6/src/**/*.mjs",
-    "lib/es6/src/**/*.d.ts",
+    "src/**/*.res.mjs",
+    "src/**/*.d.ts",
+    "src/Codegen.js",
     "rescript.json",
     "README.md",
     "LICENSE"
@@ -26,14 +27,15 @@
     "url": "https://github.com/f3liz-dev/rescript-autogen-openapi"
   },
   "scripts": {
-    "build": "rescript && node scripts/generate-dts.mjs",
+    "build": "rescript",
     "clean": "rescript clean",
     "watch": "rescript build -w",
     "test": "node --test",
     "prepublishOnly": "npm run build && npm test"
   },
-  "main": "lib/es6/src/Codegen.mjs",
-  "types": "lib/es6/src/Codegen.d.ts",
+  "main": "./src/Codegen.js",
+  "module": "./src/Codegen.res.mjs",
+  "types": "./src/Codegen.d.ts",
   "type": "module",
   "dependencies": {
     "@readme/openapi-parser": "^5.5.0",

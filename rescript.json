@@ -1,25 +1,23 @@
 {
   "name": "@f3liz/rescript-autogen-openapi",
+  "namespace": false,
+  "suffix": ".res.mjs",
   "sources": [
     {
       "dir": "src",
       "subdirs": true
     }
   ],
-  "package-specs": [
-    {
-      "module": "esmodule",
-      "in-source": false
-    }
-  ],
-  "suffix": ".mjs",
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": true
+  },
   "gentypeconfig": {
     "language": "typescript",
     "module": "es6",
     "importPath": "relative",
     "generatedFileExtension": ".gen.ts"
   },
-  "dependencies": [],
   "warnings": {
     "number": "-44-102"
   }
